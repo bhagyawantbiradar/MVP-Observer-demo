@@ -8,7 +8,6 @@ public interface MainActivityContract {
 
     interface View{
         void initView();
-        void setViewData();
     }
 
     interface Model {

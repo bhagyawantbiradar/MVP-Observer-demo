@@ -4,42 +4,110 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
+import glabbrassignment.bhagyawant.com.glabbrassignment.Constants;
 import glabbrassignment.bhagyawant.com.glabbrassignment.R;
+import glabbrassignment.bhagyawant.com.glabbrassignment.adapters.ReadDeliveredAdapter;
 import glabbrassignment.bhagyawant.com.glabbrassignment.pojo.MessageDetailsRepository;
+import glabbrassignment.bhagyawant.com.glabbrassignment.pojo.StatusDetail;
 
 
 public class MainActivity extends AppCompatActivity implements MainActivityContract.View, Observer {
 
     private Observable messageDetailsRepositoryObservable;
     private MainActivityContract.Presenter presenter;
-    private RecyclerView recyclerRead,recyclerDelivered;
+    private RecyclerView recyclerRead, recyclerDelivered;
+    private TextView tvMessage;
     private LinearLayoutManager linearLayoutManager;
+    MessageDetailsRepository messageDetailsRepository;
+    StatusDetail statusDetail;
+    ReadDeliveredAdapter readDeliveredAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //MVP
+        presenter = new MainActivityPresenter(this);
+
+        //Observer
+        messageDetailsRepositoryObservable = MessageDetailsRepository.getInstance();
+        messageDetailsRepositoryObservable.addObserver(this);
     }
 
     @Override
     public void update(Observable o, Object arg) {
+        Toast.makeText(this, "Called", Toast.LENGTH_SHORT).show();
+        if (o instanceof MessageDetailsRepository) {
+            messageDetailsRepository = (MessageDetailsRepository) messageDetailsRepositoryObservable;
+            tvMessage.setText(messageDetailsRepository.getMessage());
+
+            ArrayList<StatusDetail> tempStatusReadList = new ArrayList<>();
+            for (StatusDetail statusDetail : messageDetailsRepository.getStatusDetails()) {
+                if (statusDetail.getStatus() == Constants.READ) {
+                    tempStatusReadList.add(statusDetail);
+                }
+            }
+
+            ArrayList<StatusDetail> tempStatusDeliveredList = new ArrayList<>();
+            for (StatusDetail statusDetail : messageDetailsRepository.getStatusDetails()) {
+                if (statusDetail.getStatus() == Constants.DELIVERED) {
+                    tempStatusDeliveredList.add(statusDetail);
+                }
+            }
+
+            readDeliveredAdapter = new ReadDeliveredAdapter(messageDetailsRepository, tempStatusReadList, this);
+            recyclerRead.setAdapter(readDeliveredAdapter);
 
 
+            readDeliveredAdapter = new ReadDeliveredAdapter(messageDetailsRepository, tempStatusDeliveredList, this);
+            recyclerDelivered.setAdapter(readDeliveredAdapter);
+
+            recyclerRead.setLayoutManager(linearLayoutManager);
+            recyclerDelivered.setLayoutManager(linearLayoutManager);
+        }
     }
 
     @Override
     public void initView() {
-        messageDetailsRepositoryObservable = MessageDetailsRepository.getInstance();
-        messageDetailsRepositoryObservable.addObserver(this);
-        presenter = new MainActivityPresenter(this);
+        //VIews
+        recyclerDelivered = findViewById(R.id.recyclerDelivered);
+        recyclerRead = findViewById(R.id.recyclerRead);
+        tvMessage = findViewById(R.id.tvMessage);
+
+        //Layout manager
+        linearLayoutManager = new LinearLayoutManager(this);
+
+
+
+
+        addFaKeData();
     }
 
-    @Override
-    public void setViewData() {
+    private void addFaKeData() {
+        messageDetailsRepository = new MessageDetailsRepository();
+        ArrayList<StatusDetail> statusDetails = new ArrayList<>();
+        statusDetails.add(new StatusDetail("9854524894", Constants.DELIVERED));
+        statusDetails.add(new StatusDetail("875454864", Constants.DELIVERED));
+        statusDetails.add(new StatusDetail("4564566546", Constants.DELIVERED));
+        statusDetails.add(new StatusDetail("784564564546", Constants.DELIVERED));
+        statusDetails.add(new StatusDetail("456456415612", Constants.DELIVERED));
+        statusDetails.add(new StatusDetail("878454648672", Constants.DELIVERED));
+        statusDetails.add(new StatusDetail("7987445648412", Constants.DELIVERED));
+        messageDetailsRepository.setMessageDetails("Bhagyawant", statusDetails);
+    }
 
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        messageDetailsRepositoryObservable.deleteObserver(this);
     }
 }

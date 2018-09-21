@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:padding="8dp"
     tools:context=".main.MainActivity">
 
 
@@ -18,7 +19,7 @@
             android:id="@+id/tvMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="This is just a sample message"
+            android:text="Message will appear hear"
             android:textColor="#000"
             android:textSize="20sp" />
 
@@ -40,7 +41,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Read"
+            android:text="Read list below"
             android:textColor="#000"
             android:textSize="20sp" />
 
@@ -64,7 +65,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Delivered"
+            android:text="Delivered list below"
             android:textColor="#000"
             android:textSize="20sp" />
 

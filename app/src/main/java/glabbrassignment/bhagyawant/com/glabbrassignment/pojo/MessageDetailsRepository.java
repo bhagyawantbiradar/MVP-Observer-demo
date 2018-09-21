@@ -17,9 +17,26 @@ public class MessageDetailsRepository extends Observable {
     }
 
     public void setMessageDetails(String message, ArrayList<StatusDetail> statusDetails) {
-        message = message;
-        statusDetails = statusDetails;
+        this.message = message;
+        this.statusDetails = statusDetails;
         setChanged();
         notifyObservers();
     }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public ArrayList<StatusDetail> getStatusDetails() {
+        return statusDetails;
+    }
+
+    public void setStatusDetails(ArrayList<StatusDetail> statusDetails) {
+        this.statusDetails = statusDetails;
+    }
+
 }
