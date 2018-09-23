@@ -8,6 +8,8 @@ public interface MainActivityContract {
 
     interface View{
         void initView();
+
+        void firstListNotifty();
     }
 
     interface Model {

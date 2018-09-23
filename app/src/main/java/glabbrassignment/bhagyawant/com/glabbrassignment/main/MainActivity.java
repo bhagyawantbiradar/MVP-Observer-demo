@@ -20,11 +20,9 @@ import glabbrassignment.bhagyawant.com.glabbrassignment.pojo.StatusDetail;
 
 public class MainActivity extends AppCompatActivity implements MainActivityContract.View, Observer {
 
-    private Observable messageDetailsRepositoryObservable;
     private MainActivityContract.Presenter presenter;
     private RecyclerView recyclerRead, recyclerDelivered;
     private TextView tvMessage;
-    private LinearLayoutManager linearLayoutManager;
     MessageDetailsRepository messageDetailsRepository;
     StatusDetail statusDetail;
     ReadDeliveredAdapter readDeliveredAdapter;
@@ -33,19 +31,16 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //MVP
+        messageDetailsRepository = MessageDetailsRepository.getInstance();
+        messageDetailsRepository.addObserver(this);
         presenter = new MainActivityPresenter(this);
-
-        //Observer
-        messageDetailsRepositoryObservable = MessageDetailsRepository.getInstance();
-        messageDetailsRepositoryObservable.addObserver(this);
     }
+
 
     @Override
     public void update(Observable o, Object arg) {
         Toast.makeText(this, "Called", Toast.LENGTH_SHORT).show();
         if (o instanceof MessageDetailsRepository) {
-            messageDetailsRepository = (MessageDetailsRepository) messageDetailsRepositoryObservable;
             tvMessage.setText(messageDetailsRepository.getMessage());
 
             ArrayList<StatusDetail> tempStatusReadList = new ArrayList<>();
@@ -62,15 +57,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
                 }
             }
 
-            readDeliveredAdapter = new ReadDeliveredAdapter(messageDetailsRepository, tempStatusReadList, this);
+            readDeliveredAdapter = new ReadDeliveredAdapter(tempStatusReadList, this);
             recyclerRead.setAdapter(readDeliveredAdapter);
 
 
-            readDeliveredAdapter = new ReadDeliveredAdapter(messageDetailsRepository, tempStatusDeliveredList, this);
+            readDeliveredAdapter = new ReadDeliveredAdapter(tempStatusDeliveredList, this);
             recyclerDelivered.setAdapter(readDeliveredAdapter);
 
-            recyclerRead.setLayoutManager(linearLayoutManager);
-            recyclerDelivered.setLayoutManager(linearLayoutManager);
         }
     }
 
@@ -81,17 +74,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
         recyclerRead = findViewById(R.id.recyclerRead);
         tvMessage = findViewById(R.id.tvMessage);
 
-        //Layout manager
-        linearLayoutManager = new LinearLayoutManager(this);
 
-
-
-
+        recyclerRead.setLayoutManager(new LinearLayoutManager(this));
+        recyclerDelivered.setLayoutManager(new LinearLayoutManager(this));
         addFaKeData();
     }
 
     private void addFaKeData() {
-        messageDetailsRepository = new MessageDetailsRepository();
         ArrayList<StatusDetail> statusDetails = new ArrayList<>();
         statusDetails.add(new StatusDetail("9854524894", Constants.DELIVERED));
         statusDetails.add(new StatusDetail("875454864", Constants.DELIVERED));
@@ -104,10 +93,14 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     }
 
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        messageDetailsRepositoryObservable.deleteObserver(this);
+        messageDetailsRepository.deleteObserver(this);
+    }
+
+    @Override
+    public void firstListNotifty() {
+        readDeliveredAdapter.notifyDataSetChanged();
     }
 }

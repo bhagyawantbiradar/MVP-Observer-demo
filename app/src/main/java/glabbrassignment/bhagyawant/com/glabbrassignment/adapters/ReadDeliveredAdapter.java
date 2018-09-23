@@ -21,8 +21,8 @@ public class ReadDeliveredAdapter extends RecyclerView.Adapter<ReadDeliveredAdap
     private ArrayList<StatusDetail> statusDetails;
     private Activity activity;
 
-    public ReadDeliveredAdapter(MessageDetailsRepository messageDetailsRepository, ArrayList<StatusDetail> statusDetails, Activity activity) {
-        this.messageDetailsRepository = messageDetailsRepository;
+    public ReadDeliveredAdapter(ArrayList<StatusDetail> statusDetails, Activity activity) {
+        this.messageDetailsRepository = MessageDetailsRepository.getInstance();
         this.statusDetails = statusDetails;
         this.activity = activity;
     }
@@ -48,7 +48,7 @@ public class ReadDeliveredAdapter extends RecyclerView.Adapter<ReadDeliveredAdap
                         if(messageDetailsRepository.getStatusDetails().get(i).getContactNumber().equals(statusDetail.getContactNumber()))
                         {
                             messageDetailsRepository.getStatusDetails().get(i).setStatus(Constants.DELIVERED);
-                            messageDetailsRepository.notifyObservers();
+                            messageDetailsRepository.setMessageDetails("Status changed to delivered for "+statusDetail.getContactNumber(),statusDetails);
                         }
                     }
                 }
@@ -59,7 +59,7 @@ public class ReadDeliveredAdapter extends RecyclerView.Adapter<ReadDeliveredAdap
                         if(messageDetailsRepository.getStatusDetails().get(i).getContactNumber().equals(statusDetail.getContactNumber()))
                         {
                             messageDetailsRepository.getStatusDetails().get(i).setStatus(Constants.READ);
-                            messageDetailsRepository.notifyObservers();
+                            messageDetailsRepository.setMessageDetails("Status changed to delivered for "+statusDetail.getContactNumber(),statusDetails);
                         }
                     }
                 }

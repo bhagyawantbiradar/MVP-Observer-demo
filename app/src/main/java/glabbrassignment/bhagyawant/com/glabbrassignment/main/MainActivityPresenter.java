@@ -23,4 +23,5 @@ public class MainActivityPresenter implements MainActivityContract.Presenter {
     public void onClick(View view) {
 
     }
+
 }
